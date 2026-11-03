@@ -20,16 +20,26 @@
     <section class="hero" aria-labelledby="hero-title">
       <p class="eyebrow">For every shop without a website</p>
       <h1 id="hero-title">Bolo, aur<br>website ban jayegi.</h1>
-      <p class="hero-sub">Speak about your shop for one minute in Hindi, English or Hinglish. We build you a real website and put it online. <strong>Nothing you didn't say ever ends up on it.</strong></p>
+      <p class="hero-sub">Speak about your shop for one minute in Hindi, English or Hinglish. We build you a real website and put it online. <strong>Only what you said, confirmed by you, goes on your site.</strong></p>
       <div class="hero-flow" aria-hidden="true">
         <span>Speak</span><i>→</i><span>We listen</span><i>→</i><span>Confirm</span><i>→</i><span>Live site</span>
       </div>
+    </section>
+
+    <section class="examples" id="examples" hidden aria-labelledby="examples-title">
+      <h2 id="examples-title">See a finished site</h2>
+      <ul id="examples-list" class="examples-list"></ul>
     </section>
 
     <section class="panel" id="step-input" aria-labelledby="voice-title">
       <p class="step-kicker">Step 1</p>
       <h2 id="voice-title">Apni dukaan ke baare mein boliye</h2>
       <p class="lead muted">Name, what you sell, prices, phone number, address, timings. Jo bhi bataana ho.</p>
+
+      <p class="privacy">
+        We use your <strong>voice note</strong> and <strong>photos</strong> only to build this one website.
+        Your recording is processed to create the page, and nothing goes online until you tap Publish.
+      </p>
 
       <div class="recorder">
         <button type="button" id="record-btn" class="record-btn" aria-pressed="false">
@@ -39,10 +49,13 @@
         <div id="timer" class="timer" aria-live="polite">0:00 / 1:00</div>
       </div>
 
+      <p id="mic-notice" class="mic-notice" role="status" hidden></p>
+
       <div class="or"><span>or</span></div>
-      <label class="file-btn">
+      <label class="file-btn" id="audio-upload">
         <input type="file" id="audio-file" accept="audio/*,.opus,.ogg,.m4a,.mp3,.wav">
-        Upload a voice note
+        <span class="file-btn-icon" aria-hidden="true">↑</span>
+        <span>Upload a voice note</span>
       </label>
 
       <div id="preview" class="preview" hidden>

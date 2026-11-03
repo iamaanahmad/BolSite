@@ -8,8 +8,9 @@ Built for the Meta Global AI Developer Hackathon 2026 (Indie track). Theme: *Bui
 
 ## Live demo
 
-- App: _deployed URL here_
-- Example generated site: _slug URL here_
+- **App:** https://bolsite.vercel.app
+- **Source:** https://github.com/iamaanahmad/BolSite
+- Each run publishes its own site at `bolsite.vercel.app/<business-name>-<id>`. Generate one from the app to see a live example.
 
 ## Why it matters
 
@@ -19,7 +20,9 @@ Millions of Indian small businesses — tailors, kirana stores, repair shops —
 
 Everything on a published site comes from the owner's own words, a photo, or an answer they gave. This is enforced in code, not just in prompts:
 
-- Every extracted fact must quote the exact words from the transcript that support it. If that quote is not actually in the transcript, the fact's confidence is capped below the publish threshold.
+- Every extracted fact must cite the exact words from the transcript that support it, matched as a verbatim substring (not loose word overlap). If the quote is not in the transcript, the fact is capped below the publish threshold.
+- The proposed value must be bound to its own cited evidence: a business name must appear verbatim in its quote, and a phone's digits (including digits spoken as words, in English, Hindi, or Devanagari) must match the cited span. Interpreted fields like category and hours still require a real transcript quote.
+- A regression suite (`npm run test:gate`) encodes four exploits reviewers found — a value citing unrelated evidence, a mismatched phone, an unspoken price, and word-overlap-only evidence — as tests that must stay red-before / green-after.
 - Business name, category, and phone must each reach 0.75 confidence or the site does not publish.
 - Any weak fact gets at most one clarification question (tap, type, or skip). Still weak afterwards, it is left off the page. Never guessed.
 - Prices are returned as a number plus the exact spoken words, and a deterministic parser cross-checks them (so "ढाई सौ" must equal 250).
@@ -86,4 +89,4 @@ Environment variables (never commit real values):
 
 ## License
 
-Entries grant the hackathon organisers a perpetual, royalty-free license to the submission. Nothing proprietary is included.
+MIT — see [LICENSE](LICENSE). Hackathon entries also grant the organisers a perpetual, royalty-free license to the submission. Nothing proprietary is included. Fonts (Fraunces, Inter, Noto Sans Devanagari) are used under the SIL Open Font License.

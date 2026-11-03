@@ -2,6 +2,8 @@
 // record/upload -> WAV 16 kHz -> /api/transcribe -> /api/extract -> (/api/segment in background)
 // -> clarification questions -> /api/clarify -> /api/generate -> 360px preview + /api/verify -> /api/publish
 
+import { EXAMPLES } from '/examples.js';
+
 const MAX_SECONDS = 60;
 const TARGET_RATE = 16000;
 const MAX_PHOTOS = 3;
@@ -12,7 +14,8 @@ const PREVIEW_WIDTH = 360;
 const $ = (id) => document.getElementById(id);
 const els = {
   input: $('step-input'), recordBtn: $('record-btn'), recordLabel: $('record-label'), timer: $('timer'),
-  audioFile: $('audio-file'), preview: $('preview'), previewAudio: $('preview-audio'), previewMeta: $('preview-meta'),
+  audioFile: $('audio-file'), audioUpload: $('audio-upload'), micNotice: $('mic-notice'),
+  preview: $('preview'), previewAudio: $('preview-audio'), previewMeta: $('preview-meta'),
   photoFile: $('photo-file'), thumbs: $('thumbs'), go: $('go-btn'),
   progress: $('progress'), error: $('error'), retry: $('retry-btn'), imageModel: $('image-model'),
   results: $('results'), transcript: $('transcript'), langLine: $('lang-line'), facts: $('facts'),
@@ -72,10 +75,15 @@ async function startRecording() {
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
   } catch {
-    showError('Microphone permission was denied. You can upload a voice note instead.');
+    // Mic denied/unavailable: keep the user on the input screen and point them to upload.
+    // Do NOT show the "Working on it" pipeline.
+    els.micNotice.hidden = false;
+    els.micNotice.textContent = 'We could not use the microphone. No problem — upload a voice note below instead.';
+    els.audioUpload.classList.add('emphasis');
+    els.audioUpload.querySelector('input').focus();
     return;
   }
-  els.error.hidden = true;
+  els.micNotice.hidden = true;
   const chunks = [];
   const rec = new MediaRecorder(stream);
   state.recorder = rec;
@@ -107,6 +115,8 @@ function setAudio(blob, label) {
   els.previewAudio.src = URL.createObjectURL(blob);
   els.previewMeta.textContent = label;
   els.preview.hidden = false;
+  els.micNotice.hidden = true;
+  els.audioUpload.classList.remove('emphasis');
   updateGo();
 }
 
@@ -551,3 +561,24 @@ function restart() {
 }
 document.querySelectorAll('.restart').forEach((b) => b.addEventListener('click', restart));
 els.retry.addEventListener('click', restart);
+
+// Example sites: render only real, configured entries; otherwise the section stays hidden.
+function renderExamples() {
+  const valid = (EXAMPLES || []).filter((e) => e && e.name && typeof e.url === 'string' && /^https:\/\//.test(e.url));
+  if (!valid.length) return; // section stays hidden; never shows a broken/placeholder link
+  const list = $('examples-list');
+  list.replaceChildren(...valid.map((e) => {
+    const li = el('li');
+    const a = el('a', 'example-link');
+    a.href = e.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.append(el('span', 'example-name', e.name));
+    if (e.category) a.append(el('span', 'example-cat', e.category));
+    a.append(el('span', 'example-go', 'View site →'));
+    li.append(a);
+    return li;
+  }));
+  $('examples').hidden = false;
+}
+renderExamples();
