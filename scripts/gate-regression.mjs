@@ -145,10 +145,54 @@ test('P3: a clarification answer that supplies a value (source=clarification) is
   assert(r.facts.phone.status === 'clarify', 'weak phone did not become a clarification');
 });
 
+// --- Spoken-number recall: true prices must not be dropped just because ASR spelled them differently ---
+
+// "अढ़ाई" in both Unicode encodings: precomposed ढ़ (U+095D) and ढ + nukta (U+0922 U+093C).
+const ADHAI_PRECOMPOSED = '\u0905\u095D\u093E\u0908';
+const ADHAI_DECOMPOSED = '\u0905\u0922\u093C\u093E\u0908';
+
+for (const [label, word] of [['precomposed', ADHAI_PRECOMPOSED], ['nukta-decomposed', ADHAI_DECOMPOSED]]) {
+  test(`P7: "${label} अढ़ाई सौ रुपये" is recognised as 250 and the price is kept`, () => {
+    const transcript = `मेरी दुकान का नाम शर्मा टेलर्स है। ब्लाउज सिलाई ${word} सौ रुपये। नंबर नाइन आठ सात छह पांच चार तीन दो एक ज़ीरो।`;
+    const raw = {
+      language_detected: 'hi',
+      business_name: fact('शर्मा टेलर्स', 'मेरी दुकान का नाम शर्मा टेलर्स है'),
+      category: fact('tailor', 'शर्मा टेलर्स'),
+      phone: fact('9876543210', 'नंबर नाइन आठ सात छह पांच चार तीन दो एक ज़ीरो', 0.9),
+      whatsapp: fact(null, ''), address: fact(null, ''), hours: fact(null, ''),
+      services: [{ name: 'ब्लाउज सिलाई', price_amount: 250, price_unit: null, price_spoken: `${word} सौ रुपये`, name_confidence: 0.9, price_confidence: 0.9, evidence: `ब्लाउज सिलाई ${word} सौ रुपये` }],
+      highlights: [],
+    };
+    const r = applyGate(raw, transcript);
+    const svc = r.services.find((s) => s.name === 'ब्लाउज सिलाई');
+    assert(svc && svc.price === '₹250', `true price dropped: ${JSON.stringify(svc && { price: svc.price, flags: svc.flags })}`);
+  });
+}
+
+test('P8: spokenNumbersIn finds numbers by exact word, not by substring', async () => {
+  const { spokenNumbersIn, parseSpokenNumber } = await import('../lib/numwords.js');
+  assert(parseSpokenNumber(`${ADHAI_PRECOMPOSED} सौ`) === 250, 'precomposed adhai not 250');
+  assert(parseSpokenNumber(`${ADHAI_DECOMPOSED} सौ`) === 250, 'decomposed adhai not 250');
+  assert(parseSpokenNumber('adhai sau') === 250 && parseSpokenNumber('dhaai sau') === 250, 'roman adhai/dhaai not 250');
+  // "dosa" and "document" merely start with number-word letters; they must not form numbers.
+  assert(spokenNumbersIn('dosa document').length === 0, `substring false-positive: ${JSON.stringify(spokenNumbersIn('dosa document'))}`);
+  const hours = spokenNumbersIn('सुबह दस बजे से रात आठ बजे तक');
+  assert(JSON.stringify(hours) === '[10,8]', `hours not grounded: ${JSON.stringify(hours)}`);
+});
+
+test('R7: a WRONG price is still rejected even with the adhai spelling (adhai sau != 900)', () => {
+  const transcript = `ब्लाउज सिलाई ${ADHAI_PRECOMPOSED} सौ रुपये`;
+  const raw = validRaw();
+  raw.services = [{ name: 'ब्लाउज सिलाई', price_amount: 900, price_unit: null, price_spoken: `${ADHAI_PRECOMPOSED} सौ रुपये`, name_confidence: 0.9, price_confidence: 0.9, evidence: transcript }];
+  const r = applyGate(raw, TRANSCRIPT + ' ' + transcript);
+  const svc = r.services.find((s) => s.name === 'ब्लाउज सिलाई');
+  assert(svc && svc.price === null, `wrong price kept: ${svc && svc.price}`);
+});
+
 let failed = 0;
 for (const t of tests) {
   try {
-    t.fn();
+    await t.fn();
     console.log(`  PASS  ${t.name}`);
   } catch (err) {
     failed++;

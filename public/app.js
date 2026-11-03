@@ -573,9 +573,21 @@ function renderExamples() {
     a.href = e.url;
     a.target = '_blank';
     a.rel = 'noopener';
-    a.append(el('span', 'example-name', e.name));
-    if (e.category) a.append(el('span', 'example-cat', e.category));
-    a.append(el('span', 'example-go', 'View site →'));
+    // A screenshot is optional and must be a file we ship ourselves (public/img/), never a remote URL.
+    if (typeof e.image === 'string' && /^\/img\/[\w.-]+\.(jpg|png|webp)$/.test(e.image)) {
+      const img = el('img', 'example-shot');
+      img.src = e.image;
+      img.alt = e.imageAlt || `Screenshot of the ${e.name} website`;
+      img.width = 360;
+      img.height = 420;
+      img.loading = 'lazy';
+      a.append(img);
+    }
+    const text = el('span', 'example-text');
+    text.append(el('span', 'example-name', e.name));
+    if (e.category) text.append(el('span', 'example-cat', e.category));
+    if (e.note) text.append(el('span', 'example-note', e.note));
+    a.append(text, el('span', 'example-go', 'View site →'));
     li.append(a);
     return li;
   }));

@@ -89,14 +89,27 @@ body {
 .examples h2 { font-family: var(--display); font-weight: 600; font-size: 1.25rem; margin: 0 0 12px; }
 .examples-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .example-link {
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-  padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
-  text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: border-color 0.12s, transform 0.12s;
+  display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 6px 12px;
+  padding: 0 0 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
+  text-decoration: none; color: var(--ink); box-shadow: var(--shadow); overflow: hidden;
+  transition: border-color 0.12s, transform 0.12s;
 }
 .example-link:hover { border-color: var(--terracotta); transform: translateY(-1px); }
+.example-shot { grid-column: 1 / -1; display: block; width: 100%; height: auto; max-height: 360px; object-fit: cover; object-position: top; background: var(--paper-2); border-bottom: 1px solid var(--line); }
+.example-text { display: grid; gap: 2px; padding: 12px 0 0 16px; min-width: 0; }
+.example-link:not(:has(.example-shot)) .example-text { padding-top: 14px; }
 .example-name { font-weight: 600; }
 .example-cat { color: var(--muted); font-size: 0.9rem; }
-.example-go { margin-left: auto; color: var(--terracotta-deep); font-weight: 600; font-size: 0.9rem; }
+.example-note { color: var(--muted); font-size: 0.82rem; }
+.example-go { padding: 0 16px 0 0; color: var(--terracotta-deep); font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
+
+/* ---------- FAQ ---------- */
+.faq { margin: 8px 0 0; padding-top: 22px; border-top: 1px solid var(--line); }
+.faq h2 { font-family: var(--display); font-weight: 600; font-size: 1.25rem; margin: 0 0 10px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { cursor: pointer; padding: 14px 0; font-weight: 500; list-style-position: outside; }
+.faq summary:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 2px; border-radius: 4px; }
+.faq details p { margin: 0 0 14px; color: var(--ink-2); font-size: 0.95rem; line-height: 1.55; }
 
 /* ---------- privacy + mic notice ---------- */
 .privacy {
