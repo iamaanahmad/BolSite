@@ -27,4 +27,4 @@ export default postRoute(async (body) => {
     session_id: result.sessionId,
     model: result.model,
   };
-});
+}, { rateLimit: true });

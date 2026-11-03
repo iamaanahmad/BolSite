@@ -19,4 +19,4 @@ export default postRoute(async (body) => {
   const existing = await readJsonBlob(marker);
   if (!existing) await writeOnce(marker, JSON.stringify({ published_at: new Date().toISOString(), checks }), 'application/json');
   return { url: meta.site.canonicalUrl, slug, checks, already_published: Boolean(existing) };
-});
+}, { rateLimit: true });

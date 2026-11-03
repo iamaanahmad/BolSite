@@ -12,6 +12,7 @@
     "try-note": "node --env-file-if-exists=.env.local scripts/try-note.mjs"
   },
   "dependencies": {
+    "@upstash/redis": "1.41.0",
     "@vercel/blob": "2.8.2"
   },
   "devDependencies": {

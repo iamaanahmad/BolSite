@@ -10,4 +10,4 @@ export default postRoute(async (body) => {
   if (!transcript) throw new HttpError(400, 'transcript is required');
   if (transcript.length > 8000) throw new HttpError(400, 'transcript is too long for a 60-second note');
   return extractFacts(transcript);
-});
+}, { rateLimit: true });

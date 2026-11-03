@@ -4,6 +4,24 @@
   "functions": {
     "api/**/*.js": { "maxDuration": 120 }
   },
+  "headers": [
+    {
+      "source": "/((?!api/).*)",
+      "has": [{ "type": "host", "value": "bolsite.vercel.app" }],
+      "headers": [
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Permissions-Policy", "value": "microphone=(self), camera=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        { "key": "Content-Security-Policy", "value": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src blob:; connect-src 'self'; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/:slug([a-z0-9-]+-[a-z0-9]{6})/:file(hero\\.(?:jpg|png|webp)|c[1-6]\\.jpg)", "destination": "/api/site?slug=:slug&file=:file" },
     { "source": "/:slug([a-z0-9-]+-[a-z0-9]{6})", "destination": "/api/site?slug=:slug" }
