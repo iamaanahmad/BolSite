@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "node --env-file-if-exists=.env.local dev-server.js",
-    "try-note": "node --env-file-if-exists=.env.local scripts/try-note.mjs"
+    "try-note": "node --env-file-if-exists=.env.local scripts/try-note.mjs",
+    "test:gate": "node scripts/gate-regression.mjs"
   },
   "dependencies": {
     "@upstash/redis": "1.41.0",
