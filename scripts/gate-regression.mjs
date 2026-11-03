@@ -180,6 +180,29 @@ test('P8: spokenNumbersIn finds numbers by exact word, not by substring', async 
   assert(JSON.stringify(hours) === '[10,8]', `hours not grounded: ${JSON.stringify(hours)}`);
 });
 
+test('P9: an ASR-stuttered multiplier ("डेढ़ सौ सौ रुपये") still verifies as 150 and the price is kept', async () => {
+  const { parseSpokenNumber } = await import('../lib/numwords.js');
+  assert(parseSpokenNumber('डेढ़ सौ सौ रुपये') === 150, `stuttered sau parsed as ${parseSpokenNumber('डेढ़ सौ सौ रुपये')}`);
+  assert(parseSpokenNumber('एक हज़ार हज़ार') === 1000, 'stuttered hazaar not collapsed');
+  assert(parseSpokenNumber('चार सौ') === 400 && parseSpokenNumber('एक सौ बीस') === 120, 'normal numbers changed');
+  const transcript = 'आटा पाँच किलो का डेढ़ सौ सौ रुपये बासमती चावल एक किलो का एक सौ बीस रुपये';
+  const raw = validRaw();
+  raw.services = [{ name: 'आटा', price_amount: 150, price_unit: 'per 5 kg', price_spoken: 'डेढ़ सौ सौ रुपये', name_confidence: 0.9, price_confidence: 0.85, evidence: 'आटा पाँच किलो का डेढ़ सौ सौ रुपये' }];
+  const r = applyGate(raw, TRANSCRIPT + ' ' + transcript);
+  const svc = r.services.find((s) => s.name === 'आटा');
+  // The unit "per 5 kg" holds a digit, which the gate's strict unit pattern ignores: price shown, unit omitted.
+  assert(svc && svc.price === '₹150', `true price dropped or altered: ${JSON.stringify(svc && { p: svc.price, f: svc.flags })}`);
+});
+
+test('R8: the stutter collapse cannot be abused to smuggle a wrong price (डेढ़ सौ सौ != 250)', () => {
+  const transcript = 'आटा पाँच किलो का डेढ़ सौ सौ रुपये';
+  const raw = validRaw();
+  raw.services = [{ name: 'आटा', price_amount: 250, price_unit: null, price_spoken: 'डेढ़ सौ सौ रुपये', name_confidence: 0.9, price_confidence: 0.9, evidence: 'आटा पाँच किलो का डेढ़ सौ सौ रुपये' }];
+  const r = applyGate(raw, TRANSCRIPT + ' ' + transcript);
+  const svc = r.services.find((s) => s.name === 'आटा');
+  assert(svc && svc.price === null, `wrong price kept: ${svc && svc.price}`);
+});
+
 test('R7: a WRONG price is still rejected even with the adhai spelling (adhai sau != 900)', () => {
   const transcript = `ब्लाउज सिलाई ${ADHAI_PRECOMPOSED} सौ रुपये`;
   const raw = validRaw();
