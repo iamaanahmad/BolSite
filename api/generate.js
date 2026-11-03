@@ -9,4 +9,4 @@ import { generateSite } from '../lib/generate.js';
 export default postRoute(async (body, req) => {
   if (!body.result || typeof body.result.facts !== 'object') throw new HttpError(400, 'result is required');
   return generateSite(body, originOf(req));
-}, { rateLimit: true });
+}, { rateLimit: true, countsForClient: false });

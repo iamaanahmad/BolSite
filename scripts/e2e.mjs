@@ -58,9 +58,17 @@ if (s === 'clarify') {
   const qs = await page.$$eval('#questions .q legend', (n) => n.map((x) => x.textContent));
   log(`clarification asked: ${qs.join(' | ')}`);
   await shot('03-clarify');
+  // Known-good answers for the test note, used when a question offers no tap option.
+  const TYPED = { phone: '9570647513', whatsapp: '9570647513', business_name: 'Sharma Tailors', category: 'tailor', address: 'Lajpat Nagar Market', hours: '10 AM to 8 PM' };
   for (const fs of await page.$$('#questions .q')) {
+    const field = await fs.evaluate((n) => n.dataset.field);
     const opt = await fs.$('.opt');
-    if (opt) await opt.click();
+    if (opt) {
+      await opt.click();
+    } else {
+      const input = await fs.$('input');
+      await input.type(TYPED[field] || 'Sharma Tailors');
+    }
   }
   await page.click('#clarify-form button[type=submit]');
   s = await waitAny();

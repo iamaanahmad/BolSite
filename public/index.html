@@ -1,23 +1,35 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BolSite — bolo, website ban jayegi</title>
   <meta name="description" content="Speak about your shop for 60 seconds in Hindi, English or Hinglish and get a live website.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23e4572e'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c44a1e'/%3E%3Cpath d='M9 22V10h5.2c2.3 0 3.6 1.1 3.6 2.9 0 1.2-.7 2.1-1.8 2.4 1.4.2 2.3 1.2 2.3 2.6 0 1.9-1.4 3.1-3.8 3.1H9z' fill='%23fff'/%3E%3Ccircle cx='22.5' cy='11' r='2.2' fill='%23f2c14e'/%3E%3C/svg%3E">
+  <link rel="preload" href="/fonts/fraunces-600.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#step-input">Skip to recording</a>
   <main class="app">
-    <header class="brand">
-      <h1>BolSite</h1>
-      <p class="tagline">Bolo, aur website ban jayegi.<br><span class="muted">Speak about your shop for up to 60 seconds.</span></p>
+    <header class="masthead">
+      <div class="wordmark"><span class="mark" aria-hidden="true">B</span> BolSite</div>
     </header>
 
-    <section class="card" id="step-input" aria-labelledby="voice-title">
-      <h2 id="voice-title">1. Apni dukaan ke baare mein boliye</h2>
-      <p class="muted">Name, what you sell, prices, phone number, address, timings.</p>
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">For every shop without a website</p>
+      <h1 id="hero-title">Bolo, aur<br>website ban jayegi.</h1>
+      <p class="hero-sub">Speak about your shop for one minute in Hindi, English or Hinglish. We build you a real website and put it online. <strong>Nothing you didn't say ever ends up on it.</strong></p>
+      <div class="hero-flow" aria-hidden="true">
+        <span>Speak</span><i>→</i><span>We listen</span><i>→</i><span>Confirm</span><i>→</i><span>Live site</span>
+      </div>
+    </section>
+
+    <section class="panel" id="step-input" aria-labelledby="voice-title">
+      <p class="step-kicker">Step 1</p>
+      <h2 id="voice-title">Apni dukaan ke baare mein boliye</h2>
+      <p class="lead muted">Name, what you sell, prices, phone number, address, timings. Jo bhi bataana ho.</p>
 
       <div class="recorder">
         <button type="button" id="record-btn" class="record-btn" aria-pressed="false">
@@ -38,19 +50,23 @@
         <p id="preview-meta" class="muted small"></p>
       </div>
 
-      <h2 class="step2">2. Dukaan ki photos <span class="muted small">(up to 3, optional)</span></h2>
-      <p class="muted small">Shop front, products, counter. Phone photos are fine.</p>
-      <label class="file-btn">
-        <input type="file" id="photo-file" accept="image/*" multiple>
-        Add photos
-      </label>
-      <ul id="thumbs" class="thumbs"></ul>
+      <div class="step2">
+        <p class="step-kicker">Step 2 <span class="opt-tag">optional</span></p>
+        <h2>Dukaan ki photos</h2>
+        <p class="lead muted">Up to 3. Shop front, products, counter. Phone photos are fine.</p>
+        <label class="file-btn">
+          <input type="file" id="photo-file" accept="image/*" multiple>
+          <span class="file-btn-icon" aria-hidden="true">+</span>
+          <span>Add photos</span>
+        </label>
+        <ul id="thumbs" class="thumbs"></ul>
+      </div>
 
       <button type="button" id="go-btn" class="primary" disabled>Make my website</button>
     </section>
 
-    <section class="card" id="progress" hidden aria-live="polite">
-      <h2>Working on it</h2>
+    <section class="panel" id="progress" hidden aria-live="polite">
+      <h2 class="panel-title">Working on it</h2>
       <ol class="steps">
         <li data-step="convert">Preparing audio</li>
         <li data-step="transcribe">Listening <span class="model">Muse Voice Transcribe</span></li>
@@ -63,13 +79,13 @@
       <button type="button" id="retry-btn" class="secondary" hidden>Start over</button>
     </section>
 
-    <section class="card" id="results" hidden>
-      <h2>What we heard</h2>
+    <section class="panel" id="results" hidden>
+      <h2 class="panel-title">What we heard</h2>
       <blockquote id="transcript" class="transcript"></blockquote>
-      <p class="muted small" id="lang-line"></p>
+      <p class="lang-line" id="lang-line"></p>
 
-      <h3>Facts</h3>
-      <p class="muted small">Only facts you said go on your site. Below 75% confidence we ask you, or leave it out.</p>
+      <h3>What we understood</h3>
+      <p class="lead muted">Only what you said goes on your site. A fact under 75% sure gets one question, or we leave it out. We never make anything up.</p>
       <ul id="facts" class="facts"></ul>
 
       <div id="services-wrap" hidden>
@@ -93,7 +109,7 @@
       </div>
     </section>
 
-    <section class="card" id="clarify-card" hidden aria-labelledby="clarify-title">
+    <section class="panel" id="clarify-card" hidden aria-labelledby="clarify-title">
       <h2 id="clarify-title">Ek baar confirm kar dijiye</h2>
       <p class="muted small">We will not guess. Tap an answer, type it, or leave it empty to skip.</p>
       <form id="clarify-form">
@@ -102,13 +118,13 @@
       </form>
     </section>
 
-    <section class="card blocked" id="blocked-card" hidden>
+    <section class="panel blocked" id="blocked-card" hidden>
       <h2>We could not confirm everything</h2>
       <p id="blocked-text"></p>
       <button type="button" class="primary restart">Record again</button>
     </section>
 
-    <section class="card" id="preview-card" hidden aria-labelledby="preview-title">
+    <section class="panel" id="preview-card" hidden aria-labelledby="preview-title">
       <h2 id="preview-title">Your website</h2>
       <p class="muted small">Shown at 360px, the width of a small phone.</p>
       <div class="phone" id="phone">
@@ -119,7 +135,7 @@
       <button type="button" id="publish-btn" class="primary" disabled>Publish</button>
     </section>
 
-    <section class="card done" id="done-card" hidden>
+    <section class="panel done" id="done-card" hidden>
       <h2>Your website is live</h2>
       <a id="live-link" class="live-link" target="_blank" rel="noopener"></a>
       <div class="done-actions">

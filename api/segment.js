@@ -5,4 +5,4 @@
 import { postRoute } from '../lib/http.js';
 import { segmentPhotos } from '../lib/segment.js';
 
-export default postRoute(async (body) => segmentPhotos(body.photos, Array.isArray(body.services) ? body.services : []), { rateLimit: true });
+export default postRoute(async (body) => segmentPhotos(body.photos, Array.isArray(body.services) ? body.services : []), { rateLimit: true, countsForClient: false });
