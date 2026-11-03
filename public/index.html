@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BolSite — bolo, website ban jayegi</title>
+  <meta name="description" content="Speak about your shop for 60 seconds in Hindi, English or Hinglish and get a live website.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23e4572e'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="app">
+    <header class="brand">
+      <h1>BolSite</h1>
+      <p class="tagline">Bolo, aur website ban jayegi.<br><span class="muted">Speak about your shop for up to 60 seconds.</span></p>
+    </header>
+
+    <section class="card" id="step-input" aria-labelledby="voice-title">
+      <h2 id="voice-title">1. Apni dukaan ke baare mein boliye</h2>
+      <p class="muted">Name, what you sell, prices, phone number, address, timings.</p>
+
+      <div class="recorder">
+        <button type="button" id="record-btn" class="record-btn" aria-pressed="false">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="record-label">Tap to record</span>
+        </button>
+        <div id="timer" class="timer" aria-live="polite">0:00 / 1:00</div>
+      </div>
+
+      <div class="or"><span>or</span></div>
+      <label class="file-btn">
+        <input type="file" id="audio-file" accept="audio/*,.opus,.ogg,.m4a,.mp3,.wav">
+        Upload a voice note
+      </label>
+
+      <div id="preview" class="preview" hidden>
+        <audio id="preview-audio" controls></audio>
+        <p id="preview-meta" class="muted small"></p>
+      </div>
+
+      <h2 class="step2">2. Dukaan ki photos <span class="muted small">(up to 3, optional)</span></h2>
+      <p class="muted small">Shop front, products, counter. Phone photos are fine.</p>
+      <label class="file-btn">
+        <input type="file" id="photo-file" accept="image/*" multiple>
+        Add photos
+      </label>
+      <ul id="thumbs" class="thumbs"></ul>
+
+      <button type="button" id="go-btn" class="primary" disabled>Make my website</button>
+    </section>
+
+    <section class="card" id="progress" hidden aria-live="polite">
+      <h2>Working on it</h2>
+      <ol class="steps">
+        <li data-step="convert">Preparing audio</li>
+        <li data-step="transcribe">Listening <span class="model">Muse Voice Transcribe</span></li>
+        <li data-step="extract">Understanding your business <span class="model">Muse Spark</span></li>
+        <li data-step="segment">Finding products in your photos <span class="model">Muse Spark vision</span> <span class="model">SAM 3.1</span></li>
+        <li data-step="generate">Writing your website <span class="model">Muse Spark</span> <span class="model" id="image-model" hidden>Muse Image</span></li>
+        <li data-step="verify">Checking everything</li>
+      </ol>
+      <p id="error" class="error" role="alert" hidden></p>
+      <button type="button" id="retry-btn" class="secondary" hidden>Start over</button>
+    </section>
+
+    <section class="card" id="results" hidden>
+      <h2>What we heard</h2>
+      <blockquote id="transcript" class="transcript"></blockquote>
+      <p class="muted small" id="lang-line"></p>
+
+      <h3>Facts</h3>
+      <p class="muted small">Only facts you said go on your site. Below 75% confidence we ask you, or leave it out.</p>
+      <ul id="facts" class="facts"></ul>
+
+      <div id="services-wrap" hidden>
+        <h3>Products &amp; services</h3>
+        <ul id="services" class="services"></ul>
+      </div>
+
+      <div id="highlights-wrap" hidden>
+        <h3>Highlights</h3>
+        <ul id="highlights" class="highlights"></ul>
+      </div>
+
+      <div id="omitted-wrap" hidden>
+        <h3>Left out</h3>
+        <ul id="omitted" class="omitted"></ul>
+      </div>
+
+      <div id="found-wrap" hidden>
+        <h3>Found in your photos</h3>
+        <div id="found" class="found"></div>
+      </div>
+    </section>
+
+    <section class="card" id="clarify-card" hidden aria-labelledby="clarify-title">
+      <h2 id="clarify-title">Ek baar confirm kar dijiye</h2>
+      <p class="muted small">We will not guess. Tap an answer, type it, or leave it empty to skip.</p>
+      <form id="clarify-form">
+        <div id="questions"></div>
+        <button type="submit" class="primary">Confirm</button>
+      </form>
+    </section>
+
+    <section class="card blocked" id="blocked-card" hidden>
+      <h2>We could not confirm everything</h2>
+      <p id="blocked-text"></p>
+      <button type="button" class="primary restart">Record again</button>
+    </section>
+
+    <section class="card" id="preview-card" hidden aria-labelledby="preview-title">
+      <h2 id="preview-title">Your website</h2>
+      <p class="muted small">Shown at 360px, the width of a small phone.</p>
+      <div class="phone" id="phone">
+        <iframe id="site-frame" title="Website preview at 360 pixels wide" width="360" height="640"></iframe>
+      </div>
+      <h3>Verification</h3>
+      <ul id="checks" class="checks" aria-live="polite"></ul>
+      <button type="button" id="publish-btn" class="primary" disabled>Publish</button>
+    </section>
+
+    <section class="card done" id="done-card" hidden>
+      <h2>Your website is live</h2>
+      <a id="live-link" class="live-link" target="_blank" rel="noopener"></a>
+      <div class="done-actions">
+        <button type="button" id="copy-btn" class="secondary">Copy link</button>
+        <button type="button" id="share-btn" class="secondary" hidden>Share on WhatsApp</button>
+      </div>
+      <button type="button" class="secondary restart">Make another website</button>
+    </section>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": { "maxDuration": 120 }
+  },
+  "rewrites": [
+    { "source": "/:slug([a-z0-9-]+-[a-z0-9]{6})/:file(hero\\.(?:jpg|png|webp)|c[1-6]\\.jpg)", "destination": "/api/site?slug=:slug&file=:file" },
+    { "source": "/:slug([a-z0-9-]+-[a-z0-9]{6})", "destination": "/api/site?slug=:slug" }
+  ]
+}

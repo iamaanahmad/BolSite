@@ -1,0 +1,11 @@
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
+# local test recordings (real people's voices/phone numbers — keep out of the public repo)
+samples/
+
+node_modules/
+.vercel/
+*.log
