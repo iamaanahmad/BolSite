@@ -4,6 +4,7 @@
 //   node scripts/gate-regression.mjs      (exit 0 = all pass, 1 = failure)
 
 import { applyGate } from '../lib/extract.js';
+import { applyClarifications } from '../lib/clarify.js';
 
 const TRANSCRIPT =
   'Namaste, meri dukaan ka naam Asha Tailors hai, Lajpat Nagar market mein. ' +
@@ -210,6 +211,32 @@ test('R7: a WRONG price is still rejected even with the adhai spelling (adhai sa
   const r = applyGate(raw, TRANSCRIPT + ' ' + transcript);
   const svc = r.services.find((s) => s.name === 'ब्लाउज सिलाई');
   assert(svc && svc.price === null, `wrong price kept: ${svc && svc.price}`);
+});
+
+// --- Clarification "confirm" (one-tap yes) must still be honest ---
+
+test('C1: confirming a heard phone accepts it and publishes', async () => {
+  const raw = validRaw();
+  raw.phone = fact('98765', 'Mera number hai nine eight seven six five', 0.4); // partial -> clarify
+  const extracted = applyGate(raw, TRANSCRIPT);
+  // Simulate the model having heard a full number for the clarify prompt.
+  const clar = extracted.clarifications.find((c) => c.field === 'phone');
+  clar.heard = '+919876543210';
+  const r = await applyClarifications(extracted, [{ field: 'phone', via: 'confirm', answer: null }]);
+  assert(r.facts.phone.status === 'accepted', `confirm did not accept: ${JSON.stringify(r.facts.phone)}`);
+  assert(r.facts.phone.value === '+919876543210', `wrong confirmed value: ${r.facts.phone.value}`);
+  assert(r.facts.phone.source === 'clarification', 'source not marked as clarification');
+});
+
+test('C2: confirming an invalid heard phone does NOT accept it (honest)', async () => {
+  const raw = validRaw();
+  raw.phone = fact('12345', 'Mera number hai one two three four five', 0.4);
+  const extracted = applyGate(raw, TRANSCRIPT);
+  const clar = extracted.clarifications.find((c) => c.field === 'phone');
+  clar.heard = '12345'; // not a valid 10-digit Indian number
+  const r = await applyClarifications(extracted, [{ field: 'phone', via: 'confirm', answer: null }]);
+  assert(r.facts.phone.status !== 'accepted', 'confirmed an invalid phone');
+  assert(!r.publishable, 'publishable with an invalid confirmed phone');
 });
 
 let failed = 0;

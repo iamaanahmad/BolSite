@@ -323,23 +323,35 @@ function askQuestions(result, signText) {
       fs.append(el('legend', '', c.question));
       if (c.heard) fs.append(el('p', 'heard', `We heard: ${c.heard}`));
       const opts = el('div', 'opts-row');
+      const selectOne = (btn) => {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        opts.querySelectorAll('.opt').forEach((x) => x.setAttribute('aria-pressed', 'false'));
+        btn.setAttribute('aria-pressed', String(on));
+        if (on) fs.querySelector('input').value = '';
+      };
+      // When we heard a value, the fastest honest answer is "yes, that's right" — one tap, no retyping.
+      if (c.heard) {
+        const yes = el('button', 'opt opt-confirm');
+        yes.type = 'button';
+        yes.dataset.confirm = '1';
+        yes.setAttribute('aria-pressed', 'false');
+        yes.append(el('span', '', 'Haan, sahi hai'), el('span', 'src', 'Yes, correct'));
+        yes.addEventListener('click', () => selectOne(yes));
+        opts.append(yes);
+      }
       for (const o of c.options) {
+        if (o === c.heard) continue; // the heard value is already covered by the confirm button
         const b = el('button', 'opt', o);
         b.type = 'button';
         b.dataset.value = o;
         b.setAttribute('aria-pressed', 'false');
         if (c.field === 'business_name' && o === signText) b.append(el('span', 'src', '(from your photo)'));
-        b.addEventListener('click', () => {
-          const on = b.getAttribute('aria-pressed') !== 'true';
-          opts.querySelectorAll('.opt').forEach((x) => x.setAttribute('aria-pressed', 'false'));
-          b.setAttribute('aria-pressed', String(on));
-          if (on) fs.querySelector('input').value = '';
-        });
+        b.addEventListener('click', () => selectOne(b));
         opts.append(b);
       }
-      if (c.options.length) fs.append(opts);
+      if (opts.children.length) fs.append(opts);
       const id = `ans-${c.field}`;
-      const label = el('label', 'small muted', c.options.length ? 'Or type your answer' : 'Your answer');
+      const label = el('label', 'small muted', opts.children.length ? (c.heard ? 'No? Type the correct one' : 'Or type your answer') : 'Your answer');
       label.htmlFor = id;
       const input = el('input');
       input.id = id;
@@ -358,6 +370,7 @@ function askQuestions(result, signText) {
       const answers = [...els.questions.querySelectorAll('.q')].map((fs) => {
         const picked = fs.querySelector('.opt[aria-pressed="true"]');
         const typed = fs.querySelector('input').value.trim();
+        if (picked && picked.dataset.confirm) return { field: fs.dataset.field, via: 'confirm', answer: null };
         if (picked) return { field: fs.dataset.field, via: 'option', answer: picked.dataset.value };
         if (typed) return { field: fs.dataset.field, via: 'text', answer: typed };
         return { field: fs.dataset.field, via: 'skip', answer: null };

@@ -288,6 +288,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--terracotta); ou
 .opt:hover { background: #fff6e2; }
 .opt[aria-pressed="true"] { background: var(--saffron); border-color: var(--saffron); color: #3a2a06; transform: translateY(-1px); }
 .opt .src { font-size: 0.74rem; opacity: 0.8; margin-left: 5px; }
+.opt-confirm { border-color: var(--teal); color: var(--teal); font-weight: 600; }
+.opt-confirm:hover { background: var(--teal-soft); }
+.opt-confirm[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.opt-confirm[aria-pressed="true"] .src { opacity: 0.9; }
 .q label.small { display: block; clear: both; margin-bottom: 5px; color: #8a6410; font-weight: 500; }
 .q input[type="text"], .q input[type="tel"] {
   width: 100%; min-height: 48px; padding: 10px 14px; border: 1.5px solid #e0b659; border-radius: var(--r-sm);
