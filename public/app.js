@@ -322,6 +322,12 @@ function askQuestions(result, signText) {
       fs.dataset.field = c.field;
       fs.append(el('legend', '', c.question));
       if (c.heard) fs.append(el('p', 'heard', `We heard: ${c.heard}`));
+      if (c.heard && !c.confirmable) {
+        const phoneField = c.field === 'phone' || c.field === 'whatsapp';
+        fs.append(el('p', 'heard-bad', phoneField
+          ? "That isn't a complete 10-digit number, so we can't use it. Please type the full number."
+          : "We couldn't use that. Please type it."));
+      }
       const opts = el('div', 'opts-row');
       const selectOne = (btn) => {
         const on = btn.getAttribute('aria-pressed') !== 'true';
@@ -330,7 +336,7 @@ function askQuestions(result, signText) {
         if (on) fs.querySelector('input').value = '';
       };
       // When we heard a value, the fastest honest answer is "yes, that's right" — one tap, no retyping.
-      if (c.heard) {
+      if (c.heard && c.confirmable) {
         const yes = el('button', 'opt opt-confirm');
         yes.type = 'button';
         yes.dataset.confirm = '1';
@@ -351,7 +357,7 @@ function askQuestions(result, signText) {
       }
       if (opts.children.length) fs.append(opts);
       const id = `ans-${c.field}`;
-      const label = el('label', 'small muted', opts.children.length ? (c.heard ? 'No? Type the correct one' : 'Or type your answer') : 'Your answer');
+      const label = el('label', 'small muted', c.heard && c.confirmable ? 'No? Type the correct one' : opts.children.length ? 'Or type your answer' : 'Your answer');
       label.htmlFor = id;
       const input = el('input');
       input.id = id;

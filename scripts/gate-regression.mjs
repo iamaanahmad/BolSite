@@ -239,6 +239,29 @@ test('C2: confirming an invalid heard phone does NOT accept it (honest)', async 
   assert(!r.publishable, 'publishable with an invalid confirmed phone');
 });
 
+test('C3: a one-tap confirm is offered only when confirming can succeed (valid phone yes, 11-digit phone no)', () => {
+  const asr = 'Mera number hai nine five seven zero six four seven five five one three';
+  const mk = (value) => {
+    const raw = validRaw();
+    raw.phone = fact(value, 'nine five seven zero six four seven five five one three', 0.5);
+    return applyGate(raw, TRANSCRIPT + ' ' + asr).clarifications.find((c) => c.field === 'phone');
+  };
+  const bad = mk('95706475513');   // 11 digits: an ASR repeated a digit; can never be published
+  const good = mk('9570647513');   // a valid 10-digit number held back only for low confidence
+  assert(bad && bad.confirmable === false, `invalid phone offered a confirm button: ${JSON.stringify(bad)}`);
+  assert(good && good.confirmable === true, `valid phone not confirmable: ${JSON.stringify(good)}`);
+});
+
+test('C4: confirmable is true for a heard non-phone value and false when nothing was heard', () => {
+  const raw = validRaw();
+  raw.address = fact('Lajpat Nagar market', 'Lajpat Nagar market mein', 0.5); // heard, low confidence
+  raw.hours = fact(null, '', 0);                                              // required-style miss: nothing heard
+  const r = applyGate(raw, TRANSCRIPT);
+  const addr = r.clarifications.find((c) => c.field === 'address');
+  assert(addr && addr.confirmable === true, `heard address not confirmable: ${JSON.stringify(addr)}`);
+  assert(!r.clarifications.some((c) => c.field === 'hours' && c.confirmable), 'a never-heard field was confirmable');
+});
+
 let failed = 0;
 for (const t of tests) {
   try {

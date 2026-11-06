@@ -288,6 +288,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid var(--terracotta); ou
 .opt:hover { background: #fff6e2; }
 .opt[aria-pressed="true"] { background: var(--saffron); border-color: var(--saffron); color: #3a2a06; transform: translateY(-1px); }
 .opt .src { font-size: 0.74rem; opacity: 0.8; margin-left: 5px; }
+.q .heard-bad { clear: both; margin: -4px 0 12px; font-size: 0.9rem; font-weight: 500; color: var(--red); }
 .opt-confirm { border-color: var(--teal); color: var(--teal); font-weight: 600; }
 .opt-confirm:hover { background: var(--teal-soft); }
 .opt-confirm[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
